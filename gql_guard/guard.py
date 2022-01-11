@@ -1,7 +1,7 @@
 from functools import wraps
 from starlette.requests import Request
 from starlette.exceptions import HTTPException
-
+import os
 
 def guard(func):
     @wraps(func)
@@ -17,6 +17,10 @@ def guard(func):
                 not func.__name__ in request.user.payload['access'] and
                 not func.__qualname__ in request.user.payload['access']
             )
+            and not(
+                'DEVELOPMENT_ACCESS' in os.environ and
+                os.environ['DEVELOPMENT_ACCESS'].lower() == 'true'
+            ) 
         ): 
             raise HTTPException(status_code=403)
         
